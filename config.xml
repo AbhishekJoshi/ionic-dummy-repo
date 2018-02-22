@@ -37,9 +37,6 @@
     <preference name="orientation" value="portrait" />
     <platform name="android">
         <allow-intent href="market:*" />
-        <!-- <edit-config file="AndroidManifest.xml" mode="merge" target="/manifest/application">
-            <application android:allowBackup="false" android:usesCleartextTraffic="false" />
-        </edit-config> -->
         <icon density="ldpi" src="resources/android/icon/drawable-ldpi-icon.png" />
         <icon density="mdpi" src="resources/android/icon/drawable-mdpi-icon.png" />
         <icon density="hdpi" src="resources/android/icon/drawable-hdpi-icon.png" />
@@ -110,4 +107,5 @@
     <plugin name="cordova-plugin-ionic-webview" spec="1.1.16" />
     <plugin name="adobe-mobile-services" spec="https://github.com/Adobe-Marketing-Cloud/mobile-services.git" />
     <plugin name="cordova-plugin-app-version" spec="0.1.9" />
+    <plugin name="cordova-update-security-provider" spec="git+https://github.com/AbhishekJoshi/cordova-update-security-provider.git" />
 </widget>
