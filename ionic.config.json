@@ -1,0 +1,8 @@
+{
+  "name": "ionic-dummy-repo",
+  "app_id": "com.abhishekjoshi.ionicdemo",
+  "type": "ionic-angular",
+  "integrations": {
+    "cordova": {}
+  }
+}

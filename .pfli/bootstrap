@@ -1,0 +1,141 @@
+#!/usr/bin/env python
+# -*- coding: UTF-8 -*-
+
+import os
+import sys, subprocess, time, shutil, errno
+import argparse
+
+project_type = ''
+error_msg = {
+    'fatal': "☠️   FATAL ERROR! Something went very wrong. See stack trace for details.",
+    'missing_install': "⚠️   WARNING! {0} not found globally. We will install it globally now.",
+    'missing': "⚠️   WARNING! {0} not found.",
+    'sudo': "🔑   SUDO! {0} may need root access. Please allow root access if prompted."
+}
+accepted_projects = {'ionic', 'laravel', 'angular'}  # project lookup using this should be O(1)
+
+# Retrieves the current project type from the --type argument
+def load_project_type():
+    global project_type
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--type", help="project type")
+    args = parser.parse_args()
+
+    if not args.type:
+        print 'Error: no project type. Specify project type with the --type argument. Example: ./build --type ionic'
+        return False
+
+    project_type = args.type
+    if project_type in accepted_projects:
+        print "Detected project type: " + project_type
+    else:
+        print "Project type is not correctly set."
+        print "Acceptable project types: " + ", ".join(str(x) for x in accepted_projects)
+        sys.exit(1)
+
+# Checks if something is installed globally
+def is_installed(name):
+    time.sleep(1)
+    rc = subprocess.call(['which', name])
+    if rc == 0:
+        print name + " is installed."
+        return True
+    else:
+        return False
+
+# Checks if node/npm is installed
+def check_node_npm():
+    if is_installed('node') is False:
+        print error_msg['missing'].format('node')
+        return 1
+    if is_installed('npm') is False:
+        print error_msg['missing'].format('npm')
+        return 1
+    return 0
+
+# Install an npm package
+def install_global_node_modules(packageName):
+    print "Installing npm package " + packageName
+    try:
+        subprocess.call(['npm', 'install', '-g', packageName])
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            print error_msg['missing'].format('npm')
+        else:
+            print error_msg['fatal']
+            raise
+
+# Install python things
+def install_python_modules():
+    try:
+        print error_msg['sudo'].format('Pip')
+        subprocess.call(['sudo', 'pip', 'install', 'watchdog'])
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            print error_msg['missing'].format('Pip')
+        else:
+            print error_msg['fatal']
+            raise
+
+# Checks and installs things for Ionic if we are missing tools
+def install_ionic_global():
+    global_packages = ['cordova', 'ionic', 'bower', 'gulp']
+    print "Checking Global Packages: " + ", ".join(str(x) for x in global_packages)
+
+    for package in global_packages:
+        if is_installed(package) is False: 
+            print error_msg['missing_install'].format(package)
+            install_global_node_modules(package)
+
+def project_install_ionic():
+    try:
+        subprocess.call(['npm', 'install'])
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            print error_msg['missing'].format('npm')
+        else:
+            print error_msg['fatal']
+            raise
+    try:
+        subprocess.call(['ionic', 'state', 'restore'])
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            print error_msg['missing'].format('ionic')
+        else:
+            print error_msg['fatal']
+            raise
+
+def install_laravel_global():
+    print "What should we check/install globally for Laravel projects? "
+
+
+def install_angular_global():
+    print "What else should we check/install globally for Angular projects? "
+    global_packages = ['@angular/cli']
+
+    for package in global_packages:
+        if is_installed(package) is False: 
+            print error_msg['missing_install'].format(package)
+            install_global_node_modules(package)
+
+def main():
+    print "Running Bootstrap Script..."
+
+    load_project_type()
+    check_node_npm()
+
+    if project_type == "ionic":
+        install_ionic_global()
+        project_install_ionic()
+    elif project_type == "laravel":
+        install_laravel_global()
+    elif project_type == "angular":
+        install_angular_global()
+
+    install_python_modules()
+
+if __name__ == '__main__':
+    main()
+
+
+

@@ -1,0 +1,37 @@
+#!/usr/bin/env python
+
+from subprocess import call
+import argparse
+from sys import exit
+
+def main():
+    projectType = load_project_type()
+    test(projectType)
+
+"""
+Tests the project based off the provided project type
+"""
+def test(projectType):
+  if projectType == "laravel":
+    call("phpunit", shell=True)
+
+  if projectType == "ionic":
+    call("npm run test", shell=True)
+
+  if projectType == "angular":
+    call("ng test", shell=True)
+
+"""
+Retrieves the current project type from the --type argument
+"""
+def load_project_type():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--type", help="project type")
+    args = parser.parse_args()
+    if not args.type:
+        exit("Error: no project type. Specify project type with the --type argument. Example: ./test --type ionic")
+    return args.type
+    
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,8 @@
+{
+    "name": "appium-framework",
+    "version": "0.0.1",
+    "description": "Appium testing framework",
+    "main": "testingFramework",
+    "author": "Igor Protsenko",
+    "license": "MIT"
+}
